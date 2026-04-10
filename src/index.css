@@ -60,3 +60,14 @@ button {
 }
 
 a { text-decoration: none; color: inherit; }
+
+@media (max-width: 768px) {
+  .stats-grid-4 { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+  .bottom-grid-2 { grid-template-columns: 1fr !important; }
+  .trade-row-grid { grid-template-columns: 1fr 1fr 80px !important; }
+  .trade-row-grid .hide-mobile { display: none !important; }
+  .detail-grid-2 { grid-template-columns: 1fr !important; }
+  .filter-grid-4 { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+  .stats-chart-grid { grid-template-columns: 1fr !important; }
+  .page-pad { padding: 1rem !important; }
+}
