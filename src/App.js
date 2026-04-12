@@ -17,13 +17,25 @@ export default function App() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
+      if (session) saveSessionForExtension(session)
       setLoading(false)
     })
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
+      if (session) saveSessionForExtension(session)
     })
     return () => subscription.unsubscribe()
   }, [])
+
+  // Save session to localStorage so Chrome extension can read it
+  const saveSessionForExtension = (session) => {
+    try {
+      localStorage.setItem('flow_extension_session', JSON.stringify({
+        access_token: session.access_token,
+        user: { id: session.user.id, email: session.user.email }
+      }))
+    } catch(e) {}
+  }
 
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0D0D0D' }}>
