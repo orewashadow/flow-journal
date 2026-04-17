@@ -2,11 +2,12 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
-const EMOTIONS = ['Calm', 'Confident', 'Anxious', 'FOMO', 'Excited', 'Uncertain', 'Frustrated', 'Revenge']
-const SESSIONS = ['London', 'New York', 'Asian', 'London/NY Overlap']
-const SETUPS = ['Break of structure', 'Order block', 'Fair value gap', 'Trend continuation', 'Reversal', 'Range', 'Other']
+const EMOTIONS = ['', 'Calm', 'Confident', 'Anxious', 'FOMO', 'Excited', 'Uncertain', 'Frustrated', 'Revenge']
+const SESSIONS = ['', 'London', 'New York', 'Asian', 'London/NY Overlap']
+const SETUPS = ['', 'Break of structure', 'Order block', 'Fair value gap', 'Trend continuation', 'Reversal', 'Range', 'Other']
 const RESULTS = ['Open', 'TP hit', 'SL hit', 'Breakeven', 'Manually closed']
-const TIMEFRAMES = ['1m', '5m', '15m', '30m', '1H', '2H', '4H', '1D', '1W']
+const TIMEFRAMES = ['', '1m', '5m', '15m', '30m', '1H', '2H', '4H', '1D', '1W']
+const ENTRY_TYPES = ['', 'Limit', 'Market', 'Aggressive']
 
 export default function NewTrade({ session }) {
   const navigate = useNavigate()
@@ -24,9 +25,9 @@ export default function NewTrade({ session }) {
     pair: '', entry_price: '', stop_loss: '', take_profit: '',
     risk_reward: '', timeframe: '', session: '', setup_type: '',
     result: 'Open', trade_date: localDate, trade_time: localTime,
-    is_a_plus: null, confidence_level: 7, entry_type: '',
-    is_planned: null, emotion: '', emotion_during: '', emotion_after: '',
-    followed_rules: null, reasoning: '', mistakes: '', lessons: '', notes: ''
+    is_a_plus: '', confidence_level: 7, entry_type: '',
+    is_planned: '', emotion: '', emotion_during: '', emotion_after: '',
+    followed_rules: '', reasoning: '', lessons: '', notes: ''
   })
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
@@ -99,6 +100,8 @@ export default function NewTrade({ session }) {
       }
     }
 
+    const parseBool = (v) => v === 'yes' ? true : v === 'no' ? false : null
+
     const { error } = await supabase.from('trades').insert({
       user_id: session.user.id,
       pair: form.pair.toUpperCase(),
@@ -112,16 +115,15 @@ export default function NewTrade({ session }) {
       result: form.result,
       trade_date: form.trade_date || null,
       trade_time: form.trade_time || null,
-      is_a_plus: form.is_a_plus,
+      is_a_plus: parseBool(form.is_a_plus),
       confidence_level: form.confidence_level,
       entry_type: form.entry_type || null,
-      is_planned: form.is_planned,
+      is_planned: parseBool(form.is_planned),
       emotion: form.emotion || null,
       emotion_during: form.emotion_during || null,
       emotion_after: form.emotion_after || null,
-      followed_rules: form.followed_rules,
+      followed_rules: parseBool(form.followed_rules),
       reasoning: form.reasoning || null,
-      mistakes: form.mistakes || null,
       lessons: form.lessons || null,
       notes: form.notes || null,
       chart_url
@@ -134,22 +136,17 @@ export default function NewTrade({ session }) {
   return (
     <div style={{ padding:'1.25rem', maxWidth:680, margin:'0 auto', paddingBottom:'5rem' }}>
       <style>{`
-        .chip { padding:7px 14px; border-radius:20px; font-size:12px; font-family:'DM Sans',sans-serif; cursor:pointer; transition:all 0.15s; border:0.5px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.05); color:rgba(240,238,232,0.5); }
-        .chip.active { background:rgba(29,158,117,0.18); color:#1D9E75; border-color:rgba(29,158,117,0.5); }
-        .chip.active-red { background:rgba(226,75,74,0.15); color:#E24B4A; border-color:rgba(226,75,74,0.4); }
-        .chip.active-blue { background:rgba(55,138,221,0.15); color:#378ADD; border-color:rgba(55,138,221,0.4); }
         .section { background:#111; border:0.5px solid rgba(255,255,255,0.07); border-radius:12px; padding:1.1rem 1.25rem; margin-bottom:10px; }
-        .section-title { font-size:11px; font-weight:500; color:rgba(240,238,232,0.3); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:12px; }
+        .section-title { font-size:11px; font-weight:500; color:rgba(240,238,232,0.3); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:14px; }
         .field-label { font-size:11px; color:rgba(240,238,232,0.4); margin-bottom:5px; display:block; }
-        .chips-row { display:flex; flex-wrap:wrap; gap:6px; }
         input, select, textarea { font-family:'DM Sans',sans-serif; background:#1a1a1a; border:0.5px solid rgba(255,255,255,0.08); color:#F0EEE8; border-radius:8px; padding:9px 12px; font-size:13px; outline:none; width:100%; transition:border 0.2s; }
         input:focus, select:focus, textarea:focus { border-color:#1D9E75; }
         select option { background:#1a1a1a; }
         textarea { resize:vertical; }
         .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
         .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
-        input[type=range] { padding:0; background:transparent; border:none; accent-color:#1D9E75; }
-        input[type=range]:focus { border:none; }
+        input[type=range] { padding:4px 0; background:transparent; border:none; accent-color:#1D9E75; cursor:pointer; }
+        input[type=range]:focus { border:none; box-shadow:none; }
         @media(max-width:480px){ .grid3{grid-template-columns:1fr 1fr !important;} }
       `}</style>
 
@@ -163,16 +160,16 @@ export default function NewTrade({ session }) {
         {/* CHART */}
         <div className="section">
           <p className="section-title">Chart screenshot</p>
-          <div style={{ border:'0.5px dashed rgba(255,255,255,0.12)', borderRadius:8, padding:'1rem', textAlign:'center', cursor:'pointer', marginBottom: chartPreview ? 10 : 0 }}
+          <div style={{ border:'0.5px dashed rgba(255,255,255,0.12)', borderRadius:8, padding:'1rem', textAlign:'center', cursor:'pointer' }}
             onClick={() => document.getElementById('chart-upload').click()}>
             {chartPreview
-              ? <img src={chartPreview} alt="chart" style={{ maxWidth:'100%', maxHeight:220, borderRadius:6, objectFit:'contain' }} />
+              ? <img src={chartPreview} alt="chart" style={{ maxWidth:'100%', maxHeight:200, borderRadius:6, objectFit:'contain' }} />
               : <p style={{ fontSize:13, color:'rgba(240,238,232,0.25)' }}>Tap to upload chart — AI will auto-fill trade data</p>
             }
             <input id="chart-upload" type="file" accept="image/*" onChange={handleChart} style={{ display:'none' }} />
           </div>
           {chartPreview && (
-            <div style={{ display:'flex', gap:10, alignItems:'center' }}>
+            <div style={{ display:'flex', gap:10, marginTop:10, alignItems:'center' }}>
               <button type="button" onClick={extractFromChart} disabled={extracting} style={{ padding:'8px 16px', borderRadius:8, background:'rgba(29,158,117,0.15)', color:'#1D9E75', fontSize:12, fontFamily:"'DM Sans',sans-serif", border:'0.5px solid rgba(29,158,117,0.3)' }}>
                 {extracting ? 'Reading chart...' : 'Auto-fill from chart'}
               </button>
@@ -203,8 +200,7 @@ export default function NewTrade({ session }) {
               <div>
                 <label className="field-label">Timeframe</label>
                 <select value={form.timeframe} onChange={e => set('timeframe', e.target.value)}>
-                  <option value="">Select</option>
-                  {TIMEFRAMES.map(t => <option key={t}>{t}</option>)}
+                  {TIMEFRAMES.map(t => <option key={t} value={t}>{t || 'Select'}</option>)}
                 </select>
               </div>
             </div>
@@ -230,8 +226,7 @@ export default function NewTrade({ session }) {
               <div>
                 <label className="field-label">Session</label>
                 <select value={form.session} onChange={e => set('session', e.target.value)}>
-                  <option value="">Select</option>
-                  {SESSIONS.map(s => <option key={s}>{s}</option>)}
+                  {SESSIONS.map(s => <option key={s} value={s}>{s || 'Select'}</option>)}
                 </select>
               </div>
               <div>
@@ -243,11 +238,9 @@ export default function NewTrade({ session }) {
             </div>
             <div>
               <label className="field-label">Setup type</label>
-              <div className="chips-row">
-                {SETUPS.map(s => (
-                  <button type="button" key={s} className={`chip ${form.setup_type === s ? 'active' : ''}`} onClick={() => set('setup_type', form.setup_type === s ? '' : s)}>{s}</button>
-                ))}
-              </div>
+              <select value={form.setup_type} onChange={e => set('setup_type', e.target.value)}>
+                {SETUPS.map(s => <option key={s} value={s}>{s || 'Select setup'}</option>)}
+              </select>
             </div>
           </div>
         </div>
@@ -255,78 +248,72 @@ export default function NewTrade({ session }) {
         {/* PSYCHOLOGY */}
         <div className="section">
           <p className="section-title">Psychology</p>
-          <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
-
-            <div style={{ display:'flex', gap:10 }}>
-              <div style={{ flex:1 }}>
+          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+            <div className="grid2">
+              <div>
                 <label className="field-label">A+ setup?</label>
-                <div style={{ display:'flex', gap:6 }}>
-                  <button type="button" className={`chip ${form.is_a_plus === true ? 'active' : ''}`} style={{ flex:1, textAlign:'center' }} onClick={() => set('is_a_plus', form.is_a_plus === true ? null : true)}>A+ Yes</button>
-                  <button type="button" className={`chip ${form.is_a_plus === false ? 'active-red' : ''}`} style={{ flex:1, textAlign:'center' }} onClick={() => set('is_a_plus', form.is_a_plus === false ? null : false)}>B/C No</button>
-                </div>
+                <select value={form.is_a_plus} onChange={e => set('is_a_plus', e.target.value)}>
+                  <option value="">Select</option>
+                  <option value="yes">Yes — A+</option>
+                  <option value="no">No — B/C setup</option>
+                </select>
               </div>
-              <div style={{ flex:1 }}>
+              <div>
                 <label className="field-label">Planned or FOMO?</label>
-                <div style={{ display:'flex', gap:6 }}>
-                  <button type="button" className={`chip ${form.is_planned === true ? 'active' : ''}`} style={{ flex:1, textAlign:'center' }} onClick={() => set('is_planned', form.is_planned === true ? null : true)}>Planned</button>
-                  <button type="button" className={`chip ${form.is_planned === false ? 'active-red' : ''}`} style={{ flex:1, textAlign:'center' }} onClick={() => set('is_planned', form.is_planned === false ? null : false)}>FOMO</button>
-                </div>
+                <select value={form.is_planned} onChange={e => set('is_planned', e.target.value)}>
+                  <option value="">Select</option>
+                  <option value="yes">Planned</option>
+                  <option value="no">FOMO / Impulse</option>
+                </select>
               </div>
             </div>
-
-            <div style={{ display:'flex', gap:10 }}>
-              <div style={{ flex:1 }}>
+            <div className="grid2">
+              <div>
                 <label className="field-label">Entry type</label>
-                <div className="chips-row">
-                  {['Limit', 'Market', 'Aggressive'].map(t => (
-                    <button type="button" key={t} className={`chip ${form.entry_type === t ? 'active' : ''}`} onClick={() => set('entry_type', form.entry_type === t ? '' : t)}>{t}</button>
-                  ))}
-                </div>
+                <select value={form.entry_type} onChange={e => set('entry_type', e.target.value)}>
+                  {ENTRY_TYPES.map(t => <option key={t} value={t}>{t || 'Select'}</option>)}
+                </select>
               </div>
-              <div style={{ flex:1 }}>
-                <label className="field-label">Followed rules?</label>
-                <div style={{ display:'flex', gap:6 }}>
-                  <button type="button" className={`chip ${form.followed_rules === true ? 'active' : ''}`} style={{ flex:1, textAlign:'center' }} onClick={() => set('followed_rules', form.followed_rules === true ? null : true)}>Yes</button>
-                  <button type="button" className={`chip ${form.followed_rules === false ? 'active-red' : ''}`} style={{ flex:1, textAlign:'center' }} onClick={() => set('followed_rules', form.followed_rules === false ? null : false)}>No</button>
-                </div>
+              <div>
+                <label className="field-label">Followed your rules?</label>
+                <select value={form.followed_rules} onChange={e => set('followed_rules', e.target.value)}>
+                  <option value="">Select</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
               </div>
             </div>
-
             <div>
-              <label className="field-label">Confidence: {form.confidence_level}/10</label>
+              <label className="field-label">Confidence level: {form.confidence_level}/10</label>
               <input type="range" min="1" max="10" value={form.confidence_level} onChange={e => set('confidence_level', parseInt(e.target.value))} />
-            </div>
-
-            <div>
-              <label className="field-label">Emotion before</label>
-              <div className="chips-row">
-                {EMOTIONS.map(em => (
-                  <button type="button" key={em} className={`chip ${form.emotion === em ? 'active' : ''}`} onClick={() => set('emotion', form.emotion === em ? '' : em)}>{em}</button>
-                ))}
+              <div style={{ display:'flex', justifyContent:'space-between', fontSize:10, color:'rgba(240,238,232,0.25)', marginTop:2 }}>
+                <span>Low</span><span>High</span>
               </div>
             </div>
-
-            <div>
-              <label className="field-label">Emotion during</label>
-              <div className="chips-row">
-                {EMOTIONS.map(em => (
-                  <button type="button" key={em} className={`chip ${form.emotion_during === em ? 'active-blue' : ''}`} onClick={() => set('emotion_during', form.emotion_during === em ? '' : em)}>{em}</button>
-                ))}
+            <div className="grid3">
+              <div>
+                <label className="field-label">Emotion before</label>
+                <select value={form.emotion} onChange={e => set('emotion', e.target.value)}>
+                  {EMOTIONS.map(em => <option key={em} value={em}>{em || 'Select'}</option>)}
+                </select>
               </div>
-            </div>
-
-            <div>
-              <label className="field-label">Emotion after</label>
-              <div className="chips-row">
-                {EMOTIONS.map(em => (
-                  <button type="button" key={em} className={`chip ${form.emotion_after === em ? 'active' : ''}`} onClick={() => set('emotion_after', form.emotion_after === em ? '' : em)}>{em}</button>
-                ))}
+              <div>
+                <label className="field-label">Emotion during</label>
+                <select value={form.emotion_during} onChange={e => set('emotion_during', e.target.value)}>
+                  {EMOTIONS.map(em => <option key={em} value={em}>{em || 'Select'}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="field-label">Emotion after</label>
+                <select value={form.emotion_after} onChange={e => set('emotion_after', e.target.value)}>
+                  {EMOTIONS.map(em => <option key={em} value={em}>{em || 'Select'}</option>)}
+                </select>
               </div>
             </div>
           </div>
         </div>
 
-        {/* NOTES */}
+        {/* JOURNAL */}
         <div className="section">
           <p className="section-title">Journal</p>
           <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
@@ -335,7 +322,7 @@ export default function NewTrade({ session }) {
               <textarea value={form.reasoning} onChange={e => set('reasoning', e.target.value)} placeholder="What did you see? What was your thesis?" rows={3} />
             </div>
             <div>
-              <label className="field-label">Mistakes / lessons</label>
+              <label className="field-label">Mistakes / lessons learned</label>
               <textarea value={form.lessons} onChange={e => set('lessons', e.target.value)} placeholder="What did you learn from this trade?" rows={2} />
             </div>
           </div>
