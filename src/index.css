@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap');
+
+:root {
+  --navy: #0F1F4A;
+  --navy-mid: #1A2E6B;
+  --blue: #3B82F6;
+  --blue-light: #DBEAFE;
+  --blue-mid: #93C5FD;
+  --bg: #F8FAFF;
+  --bg-card: #ffffff;
+  --border: #E8EDFB;
+  --text: #111827;
+  --text-muted: #6B7280;
+  --text-dim: #9CA3AF;
+  --win: #10B981;
+  --win-bg: #DCFCE7;
+  --win-text: #166534;
+  --loss: #EF4444;
+  --loss-bg: #FEE2E2;
+  --loss-text: #991B1B;
+  --open-bg: #DBEAFE;
+  --open-text: #1E40AF;
+  --warn: #F59E0B;
+  --warn-bg: #FFFBEB;
+  --warn-border: #FCD34D;
+  --warn-text: #92400E;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+input, textarea, select {
+  font-family: var(--font-body);
+  background: #F9FAFB;
+  border: 0.5px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+  transition: border 0.2s;
+}
+
+input:focus, textarea:focus, select:focus { border-color: var(--blue); }
+select option { background: #fff; color: var(--text); }
+button { font-family: var(--font-body); cursor: pointer; border: none; outline: none; }
+a { text-decoration: none; color: inherit; }
+textarea { resize: vertical; }
+
+input[type=range] { padding:0; background:transparent; border:none; accent-color:var(--blue); cursor:pointer; }
+input[type=range]:focus { border:none; box-shadow:none; }
+
+@media (max-width: 768px) {
+  .sidebar { display: none !important; }
+  .bottom-nav { display: flex !important; }
+  .main-content { padding-bottom: 65px !important; }
+  .hide-mob { display: none !important; }
+  .grid-1-mob { grid-template-columns: 1fr !important; }
+  .page-pad { padding: 1rem !important; }
+}
